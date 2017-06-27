@@ -39,16 +39,16 @@ class Manager {
 	public void requestfromA(String ThreadName) throws InterruptedException{
 		lock.lock();
 		try{
-			System.out.println("Thread type A "+ThreadName+" request resource");
+			System.out.println("Thread type A "+ThreadName+" REQUEST resource");
 			if(isLocked==true){
-				System.out.println("Blocked "+ThreadName+":resource owned by"+this.shared_resource);
+				System.out.println("BLOCKED "+ThreadName+":resource owned by "+this.shared_resource);
 				waitingonA++;
 				lock_condA.await();
-				System.out.println("Awakened "+ThreadName);
+				System.out.println("AWAKENED "+ThreadName);
 			}
 			shared_resource=ThreadName;
 			isLocked=true;
-			System.out.println("Resouce owned by "+ThreadName);
+			System.out.println("Resouce OWNED by "+ThreadName);
 		}finally{
 			lock.unlock();
 		}
@@ -57,16 +57,16 @@ class Manager {
 	public void requestfromB(String ThreadName) throws InterruptedException{
 		lock.lock();
 		try{
-			System.out.println("Thread type B "+ThreadName+" request resource");
+			System.out.println("Thread type B "+ThreadName+" REQUEST resource");
 			if(isLocked==true){
-				System.out.println("Blocked "+ThreadName+":resource owned by"+this.shared_resource);
+				System.out.println("BLOCKED "+ThreadName+":resource owned by "+this.shared_resource);
 				waitingonB++;
 				lock_condB.await();
-				System.out.println("Awakened "+ThreadName);
+				System.out.println("AWAKENED "+ThreadName);
 			}
 			shared_resource=ThreadName;
 			isLocked=true;
-			System.out.println("Resouce owned by "+ThreadName);
+			System.out.println("Resouce OWNED by "+ThreadName);
 		}finally{
 			lock.unlock();
 		}
@@ -75,7 +75,7 @@ class Manager {
 	public void releasefromA(String ThreadName) throws InterruptedException{
 		lock.lock();
 		try{
-			System.out.println("Thread A "+this.shared_resource+" is releasing the resource");
+			System.out.println("Thread A "+this.shared_resource+" is RELEASING the resource");
 			this.isLocked=false;
 			if(waitingonB>0){
 				waitingonB--;
@@ -85,7 +85,7 @@ class Manager {
 				waitingonA--;
 				lock_condA.signal();
 			}
-			System.out.println("Thread A "+this.shared_resource+" has released the resource");
+			System.out.println("Thread A "+this.shared_resource+" has RELEASED the resource");
 			this.shared_resource="no one";
 		}finally{
 			lock.unlock();
@@ -95,13 +95,13 @@ class Manager {
 	public void releasefromB(String ThreadName) throws InterruptedException{
 		lock.lock();
 		try{
-			System.out.println("Thread B "+this.shared_resource+" is releasing the resource");
+			System.out.println("Thread B "+this.shared_resource+" is RELEASING the resource");
 			this.isLocked=false;
 			if(waitingonA>0){
 				waitingonA--;
 				lock_condA.signal();
 			}
-			System.out.println("Thread B "+this.shared_resource+" has released the resource");
+			System.out.println("Thread B "+this.shared_resource+" has RELEASED the resource");
 			this.shared_resource="no one";
 		}finally{
 			lock.unlock();
@@ -122,6 +122,7 @@ class ThreadTypeA extends Thread{
 			sleep((long) (1000*Math.random()));
 			m.requestfromA(name);
 			sleep((long) (1000*Math.random()));
+			System.out.println("I call release "+Thread.currentThread().getName());
 			m.releasefromA(name);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
@@ -143,6 +144,7 @@ class ThreadTypeB extends Thread{
 			sleep((long) (1000*Math.random()));
 			m.requestfromB(name);
 			sleep((long) (1000*Math.random()));
+			System.out.println("I call release "+Thread.currentThread().getName());
 			m.releasefromB(name);
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
